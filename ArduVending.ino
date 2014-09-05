@@ -1,14 +1,16 @@
 //IDE 1.05
 //TCC ENGENHENHARIA ELÉTRICA 2014
+//CHAVE 725673
 
 int serIn; //Variável para armazenar a leitura da serial
-int KEY = 123456;
+char KEY = 01234;
 int RKEY = 0;
 
 
 void setup(){
   Serial.begin(9600); //Inicialização da porta serial
   
+   Serial.println(KEY);
 }
 
 void loop(){
