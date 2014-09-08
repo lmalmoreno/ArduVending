@@ -3,7 +3,7 @@
 
 String inData = ""; //Variável para acumular os dados da serial
 String daTa = ""; //Variável com os dados pronto para uso
-String cHave = "7WDt3AKJlBX8jdMz7IhlNTiC0PIxAacoPxvy3by2KE7g0cH0d0"; //Chave de pareamento (50 digitos alfanuméricos)
+String cHave = "7WDt3AKJlB"; //Chave de pareamento (10 digitos alfanuméricos)
 boolean verif = 0; // Variável que verifica se já foi pareado na execução
 long previousMillis = 0; // Variável para comprar o tempo
 
@@ -49,9 +49,115 @@ void loop() {
        
  } // FECHA PAREAMENTO
  
- // BLOCO DA LEITURA DA SERIAL
+ //////////////////////////////////////////////////// BLOCO DA LEITURA DA SERIAL ////////////////////////////////////////////////////////
  
- // BLOCO DAS COMPARAÇÕES
+ while (Serial.available() > 0) //Enquanto tiver dados disponíveis na porta serial
+        {
+            char recieved = Serial.read(); //Escreve cada caracter por vez na variável "recieved"
+            inData += recieved; //Adiciona os caracteres escritos na variável "recieved" na variavel inData
+            if (recieved == '\n') //Se a quebra de linha (Enter) tiver sido escrita na variável recieved
+            {
+                String processString = inData; // Inicia o tratamento do dado recebido na serial copiando o que foi recebido para a variável processString
+                processString.replace("\n", ""); // Procura no dado recebido o caractere de quebra de linha (\n) que não pode estar no dado final e apaga ele
+                daTa = processString; // Após o tratamento do dado recebido copia ele para a variável daTa onde ele já está pronto para uso
+                inData = ""; // Limpa a variável que acumula os dados da serial
+            } 
+         }
+ 
+ ///////////////////////////////////////////////////// FECHA LEITURA SERIAL ////////////////////////////////////////////////////////////
+ 
+
+ 
+ /////////////////////////////////////////////////////// BLOCO DAS COMPARAÇÕES//////////////////////////////////////////////////////////
            
+ if (daTa.length() > 0)
+{
+     
+     if(daTa == "AM1")
+  {
+      Serial.println("AM1 - OK!");
+      daTa = "";
+  }
+  else
+   if(daTa == "AM2")
+  {
+      Serial.println("AM2 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "AM3")
+  {
+      Serial.println("AM3 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "TM1")
+  {
+      Serial.println("TM1 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "TM2")
+  {
+      Serial.println("TM2 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "TM3")
+  {
+      Serial.println("TM3 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "TI1")
+  {
+      Serial.println("TI1 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "TI2")
+  {
+      Serial.println("TI2 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "TI3")
+  {
+      Serial.println("TI3 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "AL1")
+  {
+      Serial.println("AL1 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "AL2")
+  {
+      Serial.println("AL2 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "AL3")
+  {
+      Serial.println("AL3 - OK!");
+      daTa = "";
+  }
+  else
+     if(daTa == "LNFC")
+  {
+      Serial.println("LNFC - OK!");
+      daTa = "";
+  }
+  else
+     daTa = "";
+     delay (100);
+     
+}  
+           
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+
+ 
 } // FECHA LOOP 
 
