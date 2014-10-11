@@ -1,14 +1,30 @@
 //IDE 1.05
 //TCC ENGENHENHARIA ELÉTRICA 2014
 
+//INICIALIZAÇÃO NFC//
+
+#include "SPI.h"
+#include "PN532_SPI.h"
+#include "snep.h"
+#include "NdefMessage.h"
+
+PN532_SPI pn532spi(SPI, 10);
+SNEP nfc(pn532spi);
+uint8_t ndefBuf[128];
+
+//-----------------//
+
+//VARIAVEIS GERAIS//
 String inData = ""; //Variável para acumular os dados da serial
 String daTa = ""; //Variável com os dados pronto para uso
 String cHave = "7WDt3AKJlB"; //Chave de pareamento (10 digitos alfanuméricos)
 boolean verif = 0; // Variável que verifica se já foi pareado na execução
 long previousMillis = 0; // Variável para comprar o tempo
+//---------------//
+
 
 void setup() {
-    Serial.begin(9600); // Habilita a comunicação serial com a velocidade de 9600   
+    Serial.begin(115200); // Habilita a comunicação serial com a velocidade de 115200   
 }
 
 void loop() {
