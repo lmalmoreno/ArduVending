@@ -14,7 +14,7 @@ uint8_t ndefBuf[128];
 
 //-----------------//
 
-//VARIAVEIS GERAIS//
+//VARIAVEIS GLOBAIS//
 String inData = ""; //Variável para acumular os dados da serial
 String daTa = ""; //Variável com os dados pronto para uso
 String cHave = "7WDt3AKJlB"; //Chave de pareamento (10 digitos alfanuméricos)
@@ -176,4 +176,58 @@ void loop() {
 
  
 } // FECHA LOOP 
+
+//////////////////////////////////////////////////////// BLOCO DAS FUNÇÕES ////////////////////////////////////////////////////////////
+
+void NFC(){
+     //ENVIANDO
+#if 1
+    //Serial.println("Send a message to Android");
+    NdefMessage message = NdefMessage();
+    message.addTextRecord("VALOR DO PRODUTO");
+    int messageSize = message.getEncodedSize();
+    if (messageSize > sizeof(ndefBuf)) {
+        Serial.println("ndefBuf is too small");
+        while (1) {
+        }
+
+    }
+
+    message.encode(ndefBuf);
+    if (0 >= nfc.write(ndefBuf, messageSize)) {
+        // Serial.println("Failed"); COLOCAR VARIAVEL
+    } else {
+       // Serial.println("Success"); COLOCAR VARIAVEL
+    }
+
+    delay(3000);
+    // RECEBENDO
+#else
+    //Serial.println("Get a message from Android");
+    int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf));
+    if (msgSize > 0) {
+        NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
+        msg.print(); // COLOCAR VALOR RECEBIDO EM VARIAVEL GLOBAL
+       // Serial.println("\nSuccess"); COLOCAR VARIAVEL
+    } else {
+       // Serial.println("failed"); COLOCAR VARIAVEL
+    }
+    delay(3000);
+#endif
+}
+
+void Teste(){
+  
+}
+
+void Motor(){
+  
+}
+
+
+
+
+
+
+///////////////////////////////////////////////////// FECHA BLOCO DAS FUNÇÕES /////////////////////////////////////////////////////////
 
