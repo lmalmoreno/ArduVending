@@ -188,8 +188,9 @@ void loop() {
 //////////////////////////////////////////////////////// BLOCO DAS FUNÇÕES ////////////////////////////////////////////////////////////
 
 void NFC(){
+// INICIO DO NFC
 
- //ESCRITA DO VALOR ---------------------------------------------------------------------------------
+// Envio do valor para o smartphone
  
   if (verifWNFC == 0) // Verifica se o smartphone ja recebeu o valor do produto
  {   
@@ -223,20 +224,13 @@ void NFC(){
         }
    
     NdefMessage message = NdefMessage();
-    message.addTextRecord(preco);
-      
+    message.addTextRecord(preco); 
     int messageSize = message.getEncodedSize();
-    if (messageSize > sizeof(ndefBuf)) 
-        {
-             while (1) {
-        }
-    }
-
     message.encode(ndefBuf);
     if (0 >= nfc.write(ndefBuf, messageSize)) 
         {
               //Falha
-         } 
+        } 
     else 
         {   
               // Sucesso
@@ -247,65 +241,55 @@ void NFC(){
         }
  }
  
+ // Leitura da autenticação de pagamento
  if (verifWNFC == 1) // Verifica se o smartphone ja recebeu o valor do produto
    {  
-            // LEITURA DA CONFIRMAÇÃO -----------------------------------------------------------
- 
-             int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf));
-             if (msgSize > 0) 
-    
-       {
-            NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
-       
-            
-            NdefRecord record = msg.getRecord(0);
 
-            int payloadLength = record.getPayloadLength();
-            byte payload[payloadLength];
-            record.getPayload(payload); // Lendo os dados do NFC
-        
-     
-            int startChar = 0;        
-            if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "T") // Ignora a foramtaçãoda língua
-          {
-                startChar = payload[0] + 1;
-          } 
+             int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf));
+             if (msgSize > 0)      
+                 {
+                      NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
+                      NdefRecord record = msg.getRecord(0);
+                      int payloadLength = record.getPayloadLength();
+                      byte payload[payloadLength];
+                      record.getPayload(payload); // Lendo os dados do NFC
+                      int startChar = 0;        
+                      if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "T") // Ignora a foramtaçãoda língua
+                        {
+                            startChar = payload[0] + 1;
+                        } 
           
-          else if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "U") // Ignora URL
+                      else if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "U") // Ignora URL
      
-              {
-                  startChar = 1;
-              }
+                        {
+                            startChar = 1;
+                        }
                           
       
-        String payloadAsString = ""; // Inicia a variável payloadAsString vazia
-        for (int c = startChar; c < payloadLength; c++) 
-              {
-                   payloadAsString += (char)payload[c]; // Armazena os dados de Payload lidos na variavel payloadAsString
-              }
+                      String payloadAsString = ""; // Inicia a variável payloadAsString vazia
+                      for (int c = startChar; c < payloadLength; c++) 
+                              {
+                                   payloadAsString += (char)payload[c]; // Armazena os dados de Payload lidos na variavel payloadAsString
+                              }
           
         
-        if(payloadAsString == "pagamentoautenticado") // Verifica se pagamento foi autenticado
-              {
-                  Serial.println("HHHH"); // Se autenticado envia confirmação
-              }
-        else
-              {
-                   Serial.println("LLLL"); // Se não envia o saldo insulficiente
-              } 
+                      if(payloadAsString == "pagamentoautenticado") // Verifica se pagamento foi autenticado
+                              {
+                                  Serial.println("HHHH"); // Se autenticado envia confirmação
+                              }
+                      else
+                              {
+                                  Serial.println("LLLL"); // Se não envia o saldo insulficiente
+                               } 
             
-    // VOLTAR PARA LOOP -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-      }    
-     else 
-         {
-            Serial.println("ENFC"); // Caso erro na leitura, informa tablet
-         }
-
-    // ------------------------------------------------------------------------------------
+    
+                }    
+           else 
+                {
+                      Serial.println("ENFC"); // Caso erro na leitura, informa tablet
+                }
   }
- 
     delay(10);
-
 // FIM DO NFC
 }
 
