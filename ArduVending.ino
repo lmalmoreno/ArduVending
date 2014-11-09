@@ -1,8 +1,7 @@
 //IDE 1.05
 //TCC ENGENHENHARIA ELÉTRICA 2014
 
-//INICIALIZAÇÃO NFC//
-
+#include <Servo.h> // Biblioteca do servo
 #include "SPI.h"
 #include "PN532_SPI.h"
 #include "snep.h"
@@ -15,23 +14,32 @@ uint8_t ndefBuf[128];
 //-----------------//
 
 //VARIAVEIS GLOBAIS//
-// -- Variaveis de Dados
+// -- Declaração do Servo --
+Servo servo1; // Declaração do servo
+// -- Declaração de pinos --
+int pinmotor = 0; // Pino variável para os motores
+int pinsensor = 0; // Pino variável para os sensores
+// -- Variaveis de Dados --
 String inData = ""; //Variável para acumular os dados da serial
 String daTa = ""; //Variável com os dados pronto para uso
 String cHave = "7WDt3AKJlB"; //Chave de pareamento (10 digitos alfanuméricos)
-String preco = "";
+String preco = ""; // Variável de proço dos produtos
+int leiturasensor = 0; // Váriavel de valor lido dos sensores
 long previousMillis = 0; // Variável para comprar o tempo
 // -- Variaveis de Verificação -- 
 boolean verif = 0; // Variável que verifica se já foi pareado na execução
 boolean verifP = 0; // Variavel de preco recebido
 boolean verifFNFC = 0; // Variavel para falhas
 boolean verifWNFC = 0; // Variavel para verificar quando o smartphone recebeu o valor
+boolean verifTM = 0; // Verifica se o motor foi parado por estouro de tempo
 //---------------//
 
 
-void setup() {
-    Serial.begin(9600); // Habilita a comunicação serial com a velocidade de 115200   
-}
+void setup() 
+    {
+        Serial.begin(9600); // Habilita a comunicação serial com a velocidade de 9600
+        pinMode(6,OUTPUT); // Pino dos sensores   
+    }
 
 void loop() {
  
@@ -95,42 +103,55 @@ void loop() {
  if (daTa.length() > 0)
     {
      
-         if(daTa == "AM1")
+         if(daTa == "AM1") // Aciona Motor 1
       {
-          Serial.println("AM1 - OK!");
           daTa = "";
+          verifTM = 0; // Declara que ainda não houve estouro de tempo
+          analogWrite(6,250); // Ativa emissor dos sensores com PWM
+          pinmotor = 9; // Declara o pino do motor 1 --------------------------------4
+          pinsensor = 5; // Declara o pino do sensor 1 ------------------------------2
+          previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
+          Motor(); // Chama void motores  
       }
       else
-       if(daTa == "AM2")
+       if(daTa == "AM2") // Aciona Motor 2
       {
           Serial.println("AM2 - OK!");
           daTa = "";
       }
       else
-         if(daTa == "AM3")
+         if(daTa == "AM3") // Aciona Motor 3
       {
           Serial.println("AM3 - OK!");
           daTa = "";
       }
       else
-         if(daTa == "TM1")
+         if(daTa == "TM1") // Teste Motor 1
       {
           Serial.println("TM1 - OK!");
           daTa = "";
       }
       else
-         if(daTa == "TM2")
+         if(daTa == "TM2") // Teste Motor 2
       {
           Serial.println("TM2 - OK!");
           daTa = "";
       }
       else
-         if(daTa == "TM3")
+         if(daTa == "TM3") // Teste Motor 3
       {
           Serial.println("TM3 - OK!");
           daTa = "";
       }
-      else
+       else
+         if(daTa == "AAAA")
+      {
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
+          verifFNFC = 0; // Confirma que o valor do produto não foi recebido
+          NFC(); // Entra na rotina do NFC
+      }
+      // Parte não necessária no momento
+      /*else
          if(daTa == "TI1")
       {
           Serial.println("TI1 - OK!");
@@ -165,18 +186,10 @@ void loop() {
       {
           Serial.println("AL3 - OK!");
           daTa = "";
-      }
-      else
-         if(daTa == "LNFC")
-      {
-          // Serial.println("LNFC - OK!");
-          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
-          verifFNFC = 0; // Confirma que o valor do produto não foi recebido
-          NFC(); // Entra na rotina do NFC
-      }
+      } */
       else
          daTa = "";
-    delay (100);
+    delay (50);
      
    }  
            
@@ -187,7 +200,8 @@ void loop() {
 
 //////////////////////////////////////////////////////// BLOCO DAS FUNÇÕES ////////////////////////////////////////////////////////////
 
-void NFC(){
+void NFC()
+{
 // INICIO DO NFC
 
 // Envio do valor para o smartphone
@@ -297,8 +311,42 @@ void Teste(){
   
 }
 
-void Motor(){
+void Motor()
+{
+ // INICIO DO MOTOR 
   
+  servo1.attach(pinmotor); // Define o pino do servo
+  servo1.write(180); // Liga o servo motor
+  leiturasensor = analogRead(pinsensor); // Armazena o valor do sensor na variável
+  delay(10);
+  if (leiturasensor >= 200) // Se o valor for maior ou igual 200 
+      {
+        servo1.detach(); // Desliga o servo motor
+        analogWrite(6,0); // Desliga emissor dos sensores
+        Serial.println("JJJJ"); // Informa que o produto foi dispensado com sucesso
+        loop();
+      }
+  else // Se não
+      {
+        
+        if (millis()- previousMillis > 10000) // Se passar 10 segundos com o valor do sensor menor que 200
+          {
+             servo1.detach(); // Desliga o servo
+             analogWrite(6,0); // Desliga emissor dos sensores
+             Serial.println("PPPP"); // Informa que houve erro na dispensa do produto
+             verifTM = 1; // Seta a verificação de estouro de tempo
+          }
+          else
+          {
+            if (verifTM == 0) // Se não parou por estouro de tempo
+                {  
+                    Motor(); // Retorna para o void ligar
+                }
+          }
+    
+    }
+  
+ // FIM DO MOTOR 
 }
 
 
