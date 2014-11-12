@@ -18,7 +18,12 @@ uint8_t ndefBuf[128];
 Servo servo1; // Declaração do servo
 // -- Declaração de pinos --
 int pinmotor = 0; // Pino variável para os motores
-int pinsensor = 0; // Pino variável para os sensores
+int pinsensor = A0; // Pino variável para os sensores
+int ledpar = 2;
+int ledNFC = 5;
+int ledsens1 = A5; // Analog
+int ledsens2 = A4;
+int ledsens3 = A3;
 // -- Variaveis de Dados --
 String inData = ""; //Variável para acumular os dados da serial
 String daTa = ""; //Variável com os dados pronto para uso
@@ -38,7 +43,12 @@ boolean verifTM = 0; // Verifica se o motor foi parado por estouro de tempo
 void setup() 
     {
         Serial.begin(9600); // Habilita a comunicação serial com a velocidade de 9600
-        pinMode(6,OUTPUT); // Pino dos sensores   
+        pinMode(6,OUTPUT); // Pino dos sensores
+        pinMode(ledpar, OUTPUT);
+        pinMode(ledNFC, OUTPUT);
+        pinMode(ledsens1, OUTPUT);
+        pinMode(ledsens2, OUTPUT);
+        pinMode(ledsens3, OUTPUT);
     }
 
 void loop() {
@@ -105,43 +115,60 @@ void loop() {
      
          if(daTa == "AM1") // Aciona Motor 1
       {
-          daTa = "";
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
           verifTM = 0; // Declara que ainda não houve estouro de tempo
           analogWrite(6,250); // Ativa emissor dos sensores com PWM
-          pinmotor = 9; // Declara o pino do motor 1 --------------------------------4
-          pinsensor = 5; // Declara o pino do sensor 1 ------------------------------2
+          pinmotor = 4; // Declara o pino do motor 1 
+          pinsensor = 2; // Declara o pino do sensor 1 
           previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
           Motor(); // Chama void motores  
       }
       else
        if(daTa == "AM2") // Aciona Motor 2
       {
-          Serial.println("AM2 - OK!");
-          daTa = "";
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
+          verifTM = 0; // Declara que ainda não houve estouro de tempo
+          analogWrite(6,250); // Ativa emissor dos sensores com PWM
+          pinmotor = 7; // Declara o pino do motor 2 
+          pinsensor = 1; // Declara o pino do sensor 2
+          previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
+          Motor(); // Chama void motores 
       }
       else
          if(daTa == "AM3") // Aciona Motor 3
       {
-          Serial.println("AM3 - OK!");
-          daTa = "";
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
+          verifTM = 0; // Declara que ainda não houve estouro de tempo
+          analogWrite(6,250); // Ativa emissor dos sensores com PWM
+          pinmotor = 8; // Declara o pino do motor 3
+          pinsensor = 0; // Declara o pino do sensor 3
+          previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
+          Motor(); // Chama void motores 
       }
       else
          if(daTa == "TM1") // Teste Motor 1
       {
-          Serial.println("TM1 - OK!");
-          daTa = "";
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
+          pinmotor = 4; // Declara o pino do motor 1
+          previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
+          Teste(); // Chama void testes
+          
       }
       else
          if(daTa == "TM2") // Teste Motor 2
       {
-          Serial.println("TM2 - OK!");
-          daTa = "";
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
+          pinmotor = 7; // Declara o pino do motor 2
+          previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
+          Teste(); // Chama void testes
       }
       else
          if(daTa == "TM3") // Teste Motor 3
       {
-          Serial.println("TM3 - OK!");
-          daTa = "";
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
+          pinmotor = 8; // Declara o pino do motor 3
+          previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
+          Teste(); // Chama void testes
       }
        else
          if(daTa == "AAAA")
@@ -150,58 +177,22 @@ void loop() {
           verifFNFC = 0; // Confirma que o valor do produto não foi recebido
           NFC(); // Entra na rotina do NFC
       }
-      // Parte não necessária no momento
-      /*else
-         if(daTa == "TI1")
-      {
-          Serial.println("TI1 - OK!");
-          daTa = "";
-      }
-      else
-         if(daTa == "TI2")
-      {
-          Serial.println("TI2 - OK!");
-          daTa = "";
-      }
-      else
-         if(daTa == "TI3")
-      {
-          Serial.println("TI3 - OK!");
-          daTa = "";
-      }
-      else
-         if(daTa == "AL1")
-      {
-          Serial.println("AL1 - OK!");
-          daTa = "";
-      }
-      else
-         if(daTa == "AL2")
-      {
-          Serial.println("AL2 - OK!");
-            daTa = "";
-      }
-      else
-         if(daTa == "AL3")
-      {
-          Serial.println("AL3 - OK!");
-          daTa = "";
-      } */
       else
          daTa = "";
     delay (50);
      
    }  
            
- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
 
- 
-} // FECHA LOOP 
+  // FECHA LOOP
+
+} 
 
 //////////////////////////////////////////////////////// BLOCO DAS FUNÇÕES ////////////////////////////////////////////////////////////
 
 void NFC()
 {
+  
 // INICIO DO NFC
 
 // Envio do valor para o smartphone
@@ -304,15 +295,35 @@ void NFC()
                 }
   }
     delay(10);
+    
 // FIM DO NFC
+
 }
 
-void Teste(){
+void Teste()
+{
+  // INICIO TESTES
   
+  servo1.attach(pinmotor); // Define o pino do servo
+  servo1.write(180); // Liga o servo motor
+
+  if (millis()- previousMillis > 10000) // Se passar 10 segundos
+      {
+         servo1.detach(); // Desliga o servo
+         Serial.println("IT"); // Informa que o teste está concluido
+      }
+      else
+      {  
+         servo1.write(180); // Liga o servo motor
+         Teste();
+      }
+      
+   // FIM TESTES
 }
 
 void Motor()
 {
+  
  // INICIO DO MOTOR 
   
   servo1.attach(pinmotor); // Define o pino do servo
@@ -347,6 +358,7 @@ void Motor()
     }
   
  // FIM DO MOTOR 
+ 
 }
 
 
