@@ -196,7 +196,6 @@ void NFC()
 // INICIO DO NFC
 
 // Envio do valor para o smartphone
- 
   if (verifWNFC == 0) // Verifica se o smartphone ja recebeu o valor do produto
  {   
     if (verifFNFC == 0) // Verifia se houve falha na leitura para não solicitar o valor novamente
@@ -232,9 +231,10 @@ void NFC()
     message.addTextRecord(preco); 
     int messageSize = message.getEncodedSize();
     message.encode(ndefBuf);
+    
     if (0 >= nfc.write(ndefBuf, messageSize)) 
         {
-              //Falha
+          //Falha
         } 
     else 
         {   
@@ -243,13 +243,14 @@ void NFC()
               verifP = 0; // Reseta a veriavel de valor recebido pela serial para receber um novo valor
               verifFNFC = 0; // Reseta para solicitar o valor novamente
               verifWNFC = 1; // Confirma que o smartphone recebeu o valor do produto
+              delay(1000);
         }
  }
  
- // Leitura da autenticação de pagamento
+  // Leitura da autenticação de pagamento
  if (verifWNFC == 1) // Verifica se o smartphone ja recebeu o valor do produto
    {  
-
+           
              int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf));
              if (msgSize > 0)      
                  {
@@ -281,20 +282,25 @@ void NFC()
                       if(payloadAsString == "pagamentoautenticado") // Verifica se pagamento foi autenticado
                               {
                                   Serial.println("HHHH"); // Se autenticado envia confirmação
+                                  verifWNFC = 0;
                               }
                       else
                               {
                                   Serial.println("LLLL"); // Se não envia o saldo insulficiente
                                } 
             
-    
-                }    
-           else 
+                delay(1000);    
+                }
+                
+                
+            else 
                 {
-                      Serial.println("ENFC"); // Caso erro na leitura, informa tablet
+                   Serial.println("ENFC"); // Caso erro na leitura, informa tablet
                 }
   }
+ 
     delay(10);
+
     
 // FIM DO NFC
 
