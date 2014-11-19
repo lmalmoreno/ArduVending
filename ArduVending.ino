@@ -19,11 +19,12 @@ Servo servo1; // Declaração do servo
 // -- Declaração de pinos --
 int pinmotor = 0; // Pino variável para os motores
 int pinsensor = A0; // Pino variável para os sensores
-int ledpar = 2;
-int ledNFC = 5;
-int ledsens1 = A5; // Analog
-int ledsens2 = A4;
-int ledsens3 = A3;
+int ledpar = 2;  // Pino de LED de status
+int ledNFC = 5;  // Pino de LED de status
+int ledsens = 0;  // Pino variável de LED de status
+int ledsens1 = A5;  // Pino de LED de status
+int ledsens2 = A4;  // Pino de LED de status
+int ledsens3 = A3;  // Pino de LED de status
 // -- Variaveis de Dados --
 String inData = ""; //Variável para acumular os dados da serial
 String daTa = ""; //Variável com os dados pronto para uso
@@ -43,12 +44,25 @@ boolean verifTM = 0; // Verifica se o motor foi parado por estouro de tempo
 void setup() 
     {
         Serial.begin(9600); // Habilita a comunicação serial com a velocidade de 9600
-        pinMode(6,OUTPUT); // Pino dos sensores
-        pinMode(ledpar, OUTPUT);
-        pinMode(ledNFC, OUTPUT);
-        pinMode(ledsens1, OUTPUT);
-        pinMode(ledsens2, OUTPUT);
-        pinMode(ledsens3, OUTPUT);
+        pinMode(6,OUTPUT); // Pino dos sensores como saída
+        pinMode(ledpar, OUTPUT); // Define o pino do LED de status como saída
+        pinMode(ledNFC, OUTPUT); // Define o pino do LED de status como saída
+        pinMode(ledsens1, OUTPUT); // Define o pino do LED de status como saída
+        pinMode(ledsens2, OUTPUT); // Define o pino do LED de status como saída
+        pinMode(ledsens3, OUTPUT); // Define o pino do LED de status como saída
+        
+        digitalWrite(ledpar, HIGH);   //
+        digitalWrite(ledNFC, HIGH);   //    LIGA OS LEDS
+        digitalWrite(ledsens1, HIGH); //    PARA EFETUAR 
+        digitalWrite(ledsens2, HIGH); //       TESTE
+        digitalWrite(ledsens3, HIGH); //
+        delay(1000); // Aguarda 1 segundo
+        digitalWrite(ledpar, LOW);   //    
+        digitalWrite(ledNFC, LOW);   //   DESLIGA OS LEDS
+        digitalWrite(ledsens1, LOW); //        TESTE
+        digitalWrite(ledsens2, LOW); //      COMPLETO
+        digitalWrite(ledsens3, LOW); //
+        
     }
 
 void loop() {
@@ -78,7 +92,8 @@ void loop() {
        if(daTa == cHave) // Verifica se o dado que está em daTa é a chave de pareamento 
          {
            Serial.println("IP"); // Informa que foi pareado com sucesso
-           verif = 1; // Seta o verif para informar que não é mais preciso efetuar o pareamento nesta execução 
+           verif = 1; // Seta o verif para informar que não é mais preciso efetuar o pareamento nesta execução
+           digitalWrite(ledpar, HIGH); // Liga o LED indicando que o pareamento foi feito com sucesso
          }
        else
            if (daTa != "") // Se tiver dado na variável e ele não for igual a chave de pareamento
@@ -117,9 +132,10 @@ void loop() {
       {
           daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
           verifTM = 0; // Declara que ainda não houve estouro de tempo
-          analogWrite(6,250); // Ativa emissor dos sensores com PWM
+          analogWrite(3,250); // Ativa emissor dos sensores com PWM
           pinmotor = 4; // Declara o pino do motor 1 
-          pinsensor = 2; // Declara o pino do sensor 1 
+          pinsensor = 2; // Declara o pino do sensor 1
+          ledsens = A5; // Declara a porta do LED do sensor 1
           previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
           Motor(); // Chama void motores  
       }
@@ -128,9 +144,10 @@ void loop() {
       {
           daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
           verifTM = 0; // Declara que ainda não houve estouro de tempo
-          analogWrite(6,250); // Ativa emissor dos sensores com PWM
+          analogWrite(3,250); // Ativa emissor dos sensores com PWM
           pinmotor = 7; // Declara o pino do motor 2 
           pinsensor = 1; // Declara o pino do sensor 2
+          ledsens = A4; // Declara a porta do LED do sensor 2
           previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
           Motor(); // Chama void motores 
       }
@@ -139,9 +156,10 @@ void loop() {
       {
           daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
           verifTM = 0; // Declara que ainda não houve estouro de tempo
-          analogWrite(6,250); // Ativa emissor dos sensores com PWM
+          analogWrite(3,250); // Ativa emissor dos sensores com PWM
           pinmotor = 8; // Declara o pino do motor 3
           pinsensor = 0; // Declara o pino do sensor 3
+          ledsens = A3; // Declara a porta do LED do sensor 3
           previousMillis = millis(); // Armazena o valor atual de tempo para posterior comparação
           Motor(); // Chama void motores 
       }
@@ -196,6 +214,7 @@ void NFC()
 // INICIO DO NFC
 
 // Envio do valor para o smartphone
+  digitalWrite(ledNFC, HIGH); // Acende o LED indicando que ativou o NFC
   if (verifWNFC == 0) // Verifica se o smartphone ja recebeu o valor do produto
  {   
     if (verifFNFC == 0) // Verifia se houve falha na leitura para não solicitar o valor novamente
@@ -212,6 +231,7 @@ void NFC()
                     {
                         String processString = inData; // Inicia o tratamento do dado recebido na serial copiando o que foi recebido para a variável processString
                         processString.replace("\n", ""); // Procura no dado recebido o caractere de quebra de linha (\n) que não pode estar no dado final e apaga ele
+                        delay (50);
                         preco = processString; // Após o tratamento do dado recebido copia ele para a variável preco onde ele já está pronto para uso
                         delay (50);
                         inData = ""; // Limpa a variável que acumula os dados da serial
@@ -225,26 +245,34 @@ void NFC()
         {
             Serial.println("DDDD"); // Confirma recebimento do valor do produto
             verifFNFC = 1;
+            delay(10);
         }
-   
+        
+   // Envio do valor
     NdefMessage message = NdefMessage();
+    delay(10);
     message.addTextRecord(preco); 
+    delay(10);
     int messageSize = message.getEncodedSize();
+    delay(10);
     message.encode(ndefBuf);
-    
-    if (0 >= nfc.write(ndefBuf, messageSize)) 
-        {
-          //Falha
-        } 
-    else 
-        {   
-              // Sucesso
-              preco = ""; // Limpa a variável preco
-              verifP = 0; // Reseta a veriavel de valor recebido pela serial para receber um novo valor
-              verifFNFC = 0; // Reseta para solicitar o valor novamente
-              verifWNFC = 1; // Confirma que o smartphone recebeu o valor do produto
-              delay(1000);
-        }
+    delay(10);
+      
+                if (0 >= nfc.write(ndefBuf, messageSize)) 
+                    {
+                      Serial.println("Falha 01");                                                                                                           //Falha
+                      NFC(); // Volta na rotina do NFC
+                    } 
+                else 
+                    {   
+                          // Sucesso
+                          preco = ""; // Limpa a variável preco
+                          verifP = 0; // Reseta a veriavel de valor recebido pela serial para receber um novo valor
+                          verifFNFC = 0; // Reseta para solicitar o valor novamente
+                          verifWNFC = 1; // Confirma que o smartphone recebeu o valor do produto
+                          delay(1000);
+                    }
+            
  }
  
   // Leitura da autenticação de pagamento
@@ -296,9 +324,10 @@ void NFC()
             else 
                 {
                    Serial.println("ENFC"); // Caso erro na leitura, informa tablet
+                   NFC();
                 }
   }
- 
+    digitalWrite(ledNFC, LOW); // Apagao LED indicando que desativou o NFC
     delay(10);
 
     
@@ -338,15 +367,18 @@ void Motor()
   delay(10);
   if (leiturasensor >= 200) // Se o valor for maior ou igual 200 
       {
+        digitalWrite(ledsens, HIGH); // Ativa o LED indicando que o sensor foi ativado
         servo1.detach(); // Desliga o servo motor
         analogWrite(6,0); // Desliga emissor dos sensores
         Serial.println("JJJJ"); // Informa que o produto foi dispensado com sucesso
+        delay(500);
+        digitalWrite(ledsens, LOW); // Desativa o LED 
         loop();
       }
   else // Se não
       {
         
-        if (millis()- previousMillis > 10000) // Se passar 10 segundos com o valor do sensor menor que 200
+        if (millis()- previousMillis > 8000) // Se passar 8 segundos com o valor do sensor menor que 200
           {
              servo1.detach(); // Desliga o servo
              analogWrite(6,0); // Desliga emissor dos sensores
