@@ -1,15 +1,32 @@
-//IDE 1.05
-//TCC ENGENHENHARIA ELÉTRICA 2014
+
+/*
+                                        PROGRAMA DE CONTROLE DE VENDING MACHINE COM PAGAMENTO POR NFC
+                    ESTE PROGRAMA FAZ PARTE DE UM TCC E NÃO PODE SER USADO COMERCIALMENTE SEM A AUTORIZAÇÃO DE SEU(S) AUTORE(S)
+       
+       **** Este trabalho está licenciado com uma Licença Creative Commons - Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional. ****
+                                            http://creativecommons.org/licenses/by-nc-sa/4.0/
+                                            
+               ESTE PROGRAMA, TODAS AS SUAS VERSÕES E NOTAS ESTÃO DISPONÍVEIS NO ENDEREÇO: https://github.com/lmalmoreno/ArduVending
+              
+                                                     DESENVOLVIDO COM A IDE 1.0.5-r2
+                                                      DESENVOLVIDO PARA ARDUINO UNO
+                                                         CONCLUÍDO EM: 20/11/2014
+                                                       OBRIGADO PELO SEU INTERESSE!
+        
+
+*/
+
+// INÍCIO DO PROGRAMA
 
 #include <Servo.h> // Biblioteca do servo
-#include "SPI.h"
-#include "PN532_SPI.h"
-#include "snep.h"
-#include "NdefMessage.h"
+#include "SPI.h" // Biblioteca da comunicação SPI
+#include "PN532_SPI.h" // Biblioteca do módulo NFC
+#include "snep.h" // Biblioteca da base SNEP
+#include "NdefMessage.h" // Biblioteca do protocolo NDEF
 
-PN532_SPI pn532spi(SPI, 10);
-SNEP nfc(pn532spi);
-uint8_t ndefBuf[128];
+PN532_SPI pn532spi(SPI, 10); // Define os pinos da comunicação SPI
+SNEP nfc(pn532spi); // Inicia a configuração SNEP para ler mensagens NDEF
+uint8_t ndefBuf[128]; // Tamanho da memória alocada para receber a tabela NDEF (Cuidado ao modificar este valor, o módulo pode parar de responder!)
 
 //-----------------//
 
@@ -58,16 +75,16 @@ void setup()
         digitalWrite(ledsens3, HIGH); //
         delay(1000); // Aguarda 1 segundo
         digitalWrite(ledpar, LOW);   //    
-        digitalWrite(ledNFC, LOW);   //   DESLIGA OS LEDS
-        digitalWrite(ledsens1, LOW); //        TESTE
-        digitalWrite(ledsens2, LOW); //      COMPLETO
+        digitalWrite(ledNFC, LOW);   //    DESLIGA OS LEDS
+        digitalWrite(ledsens1, LOW); //         TESTE
+        digitalWrite(ledsens2, LOW); //       COMPLETO
         digitalWrite(ledsens3, LOW); //
         
     }
 
 void loop() {
  
- // BLOCO DO PAREAMENTO 
+ //////////////////////////////// BLOCO DO PAREAMENTO ///////////////////////////////////
  while (verif == 0) // Enquanto não for feito o pareamento
  {
       while (Serial.available() > 0) //Enquanto tiver dados disponíveis na porta serial
@@ -104,7 +121,7 @@ void loop() {
        
  } // FECHA PAREAMENTO
  
- //////////////////////////////////////////////////// BLOCO DA LEITURA DA SERIAL ////////////////////////////////////////////////////////
+ /////////////////////////// BLOCO DA LEITURA DA SERIAL /////////////////////////////////
  
  while (Serial.available() > 0) //Enquanto tiver dados disponíveis na porta serial
         {
@@ -119,13 +136,13 @@ void loop() {
             } 
          }
  
- ///////////////////////////////////////////////////// FECHA LEITURA SERIAL ////////////////////////////////////////////////////////////
+ /////////////////////////// FECHA LEITURA SERIAL ///////////////////////////////////
  
 
  
- /////////////////////////////////////////////////////// BLOCO DAS COMPARAÇÕES//////////////////////////////////////////////////////////
+ ////////////////////////// BLOCO DAS COMPARAÇÕES////////////////////////////////////
            
- if (daTa.length() > 0)
+ if (daTa.length() > 0) // Se existir algum dado pronto para uso
     {
      
          if(daTa == "AM1") // Aciona Motor 1
@@ -196,8 +213,9 @@ void loop() {
           NFC(); // Entra na rotina do NFC
       }
       else
-         daTa = "";
-    delay (50);
+         daTa = ""; // Apaga os dados para ser usada novamente
+         
+    delay (50); // Delay para terminar tarefas pendentes
      
    }  
            
@@ -206,7 +224,7 @@ void loop() {
 
 } 
 
-//////////////////////////////////////////////////////// BLOCO DAS FUNÇÕES ////////////////////////////////////////////////////////////
+////////////////////////////// BLOCO DAS FUNÇÕES ///////////////////////////////////
 
 void NFC()
 {
@@ -231,9 +249,9 @@ void NFC()
                     {
                         String processString = inData; // Inicia o tratamento do dado recebido na serial copiando o que foi recebido para a variável processString
                         processString.replace("\n", ""); // Procura no dado recebido o caractere de quebra de linha (\n) que não pode estar no dado final e apaga ele
-                        delay (50);
+                        delay (50); // Delay para terminar tarefas pendentes
                         preco = processString; // Após o tratamento do dado recebido copia ele para a variável preco onde ele já está pronto para uso
-                        delay (50);
+                        delay (50); // Delay para terminar tarefas pendentes
                         inData = ""; // Limpa a variável que acumula os dados da serial
                         verifP = 1; // Confirma recebimento do valor pela serial
                     } 
@@ -241,27 +259,28 @@ void NFC()
     }
     
     
-    if (verifFNFC == 0)
+    if (verifFNFC == 0) // Se o valor foi recebido pelo arduino
         {
             Serial.println("DDDD"); // Confirma recebimento do valor do produto
-            verifFNFC = 1;
-            delay(10);
+            verifFNFC = 1; // Seta variavél para não solicitar o valor novamente
+            delay(50); // Delay para terminar tarefas pendentes
         }
         
    // Envio do valor
-    NdefMessage message = NdefMessage();
-    delay(10);
-    message.addTextRecord(preco); 
-    delay(10);
-    int messageSize = message.getEncodedSize();
-    delay(10);
-    message.encode(ndefBuf);
-    delay(10);
+    NdefMessage message = NdefMessage(); // Prepara variáveis internas para receber valor a ser enviado
+    delay(10); // Delay para terminar tarefas pendentes
+    message.addTextRecord(preco); // Grava valor a ser enviado na variável
+    delay(10); // Delay para terminar tarefas pendentes
+    int messageSize = message.getEncodedSize(); // Determina o tamanho da mensagem
+    delay(10); // Delay para terminar tarefas pendentes
+    message.encode(ndefBuf); // Monta tabela NDEF que está pronta para envio
+    delay(10); // Delay para terminar tarefas pendentes
       
-                if (0 >= nfc.write(ndefBuf, messageSize)) 
-                    {
-                      Serial.println("Falha 01");                                                                                                           //Falha
-                      NFC(); // Volta na rotina do NFC
+                if (0 >= nfc.write(ndefBuf, messageSize)) // Se tabela enviada estiver vazia
+                    { 
+                          // Falha
+                          // Isso é decorrente de uma falha de sincronia entre o Arduino e o Módulo, para corrigir esse erro é necessário remontar a tabela
+                          NFC(); // Volta na rotina do NFC corrigindo o erro
                     } 
                 else 
                     {   
@@ -270,7 +289,7 @@ void NFC()
                           verifP = 0; // Reseta a veriavel de valor recebido pela serial para receber um novo valor
                           verifFNFC = 0; // Reseta para solicitar o valor novamente
                           verifWNFC = 1; // Confirma que o smartphone recebeu o valor do produto
-                          delay(1000);
+                          delay(1000); // Delay para terminar tarefas pendentes
                     }
             
  }
@@ -279,56 +298,56 @@ void NFC()
  if (verifWNFC == 1) // Verifica se o smartphone ja recebeu o valor do produto
    {  
            
-             int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf));
-             if (msgSize > 0)      
+             int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf)); // Prepara e recebe a tabela NDEF na variável
+             if (msgSize > 0) // Se a tabela NDEF foi recebida   
                  {
-                      NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
-                      NdefRecord record = msg.getRecord(0);
-                      int payloadLength = record.getPayloadLength();
-                      byte payload[payloadLength];
-                      record.getPayload(payload); // Lendo os dados do NFC
-                      int startChar = 0;        
-                      if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "T") // Ignora a foramtaçãoda língua
+                      NdefMessage msg  = NdefMessage(ndefBuf, msgSize); // Inicia o tratamento da mensagem NDEF
+                      NdefRecord record = msg.getRecord(0); // Copia a tabela NDEF para uma variável
+                      int payloadLength = record.getPayloadLength(); // Copia somente o Payload para uma variável apenas para medir seu tamanho
+                      byte payload[payloadLength]; // Mede o tamanho do Payload
+                      record.getPayload(payload); // Copia novamente o Payload agora para uma variável manipulável
+                      int startChar = 0; // Inicia uma váriavel para tratar o Payload
+                      if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "T") // Ignora a foramtação da língua
                         {
-                            startChar = payload[0] + 1;
+                            startChar = payload[0] + 1; // Padrões de formatação de lingua do NDEF para mais informações ver especificações do NDEF
                         } 
           
-                      else if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "U") // Ignora URL
+                      else if (record.getTnf() == TNF_WELL_KNOWN && record.getType() == "U") // Ignora qualquer URL
      
                         {
-                            startChar = 1;
+                            startChar = 1; // Padrões de URL do NDEF para mais informações ver especificações do NDEF
                         }
                           
       
                       String payloadAsString = ""; // Inicia a variável payloadAsString vazia
-                      for (int c = startChar; c < payloadLength; c++) 
+                      for (int c = startChar; c < payloadLength; c++) // Grava Payload na variável
                               {
                                    payloadAsString += (char)payload[c]; // Armazena os dados de Payload lidos na variavel payloadAsString
                               }
           
         
-                      if(payloadAsString == "pagamentoautenticado") // Verifica se pagamento foi autenticado
+                      if(payloadAsString == "pagamentoautenticado") // Compara os dados da Payload e verifica se pagamento foi autenticado
                               {
                                   Serial.println("HHHH"); // Se autenticado envia confirmação
-                                  verifWNFC = 0;
+                                  verifWNFC = 0; // Reseta variável para um novo ciclo
                               }
                       else
                               {
                                   Serial.println("LLLL"); // Se não envia o saldo insulficiente
                                } 
             
-                delay(1000);    
+                delay(100); // Delay para terminar tarefas pendentes
                 }
                 
                 
             else 
                 {
                    Serial.println("ENFC"); // Caso erro na leitura, informa tablet
-                   NFC();
+                   NFC(); // Volta na rotina do NFC corrigindo o erro
                 }
   }
     digitalWrite(ledNFC, LOW); // Apagao LED indicando que desativou o NFC
-    delay(10);
+    delay(10); // Delay para terminar tarefas pendentes
 
     
 // FIM DO NFC
@@ -350,7 +369,7 @@ void Teste()
       else
       {  
          servo1.write(180); // Liga o servo motor
-         Teste();
+         Teste(); // Retorna para a rotina de testes
       }
       
    // FIM TESTES
@@ -399,10 +418,5 @@ void Motor()
  
 }
 
-
-
-
-
-
-///////////////////////////////////////////////////// FECHA BLOCO DAS FUNÇÕES /////////////////////////////////////////////////////////
+///////////////////////////// FECHA BLOCO DAS FUNÇÕES /////////////////////////////
 
