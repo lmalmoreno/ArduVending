@@ -100,11 +100,11 @@ void loop() {
             } 
          }
   
-       if (millis() - previousMillis > 5000) // Se já faz mais de 5 segundos que enviou SP na serial
-         {
-           previousMillis = millis(); // Guarda o tempo em que SP foi escrito na serial
-           Serial.println("SP"); // Escreve SP na serial informando que está pronto para parear
-         }
+    //   if (millis() - previousMillis > 5000) // Se já faz mais de 5 segundos que enviou SP na serial
+     //    {
+     //      previousMillis = millis(); // Guarda o tempo em que SP foi escrito na serial
+     //      Serial.println("SP"); // Escreve SP na serial informando que está pronto para parear
+      //   }
           
        if(daTa == cHave) // Verifica se o dado que está em daTa é a chave de pareamento 
          {
@@ -211,6 +211,12 @@ void loop() {
           daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada
           verifFNFC = 0; // Confirma que o valor do produto não foi recebido
           NFC(); // Entra na rotina do NFC
+      }
+       else
+         if(daTa == "7WDt3AKJlB")   //// MODIFICADO
+      {
+          daTa = ""; // Garante que a variavel daTa esteja limpa para ser usada      //// MODIFICADO
+          Serial.println("IP");
       }
       else
          daTa = ""; // Apaga os dados para ser usada novamente
