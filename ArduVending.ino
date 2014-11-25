@@ -285,7 +285,7 @@ void NFC()
                 if (0 >= nfc.write(ndefBuf, messageSize)) // Se tabela enviada estiver vazia
                     { 
                           // Falha
-                          // Isso é decorrente de uma falha de sincronia entre o Arduino e o Módulo, para corrigir esse erro é necessário remontar a tabela
+                          // Este é decorrente de uma falha de sincronia entre o Arduino e o Módulo, para corrigir esse erro é necessário remontar a tabela
                           NFC(); // Volta na rotina do NFC corrigindo o erro
                     } 
                 else 
@@ -295,10 +295,11 @@ void NFC()
                           verifP = 0; // Reseta a veriavel de valor recebido pela serial para receber um novo valor
                           verifFNFC = 0; // Reseta para solicitar o valor novamente
                           verifWNFC = 1; // Confirma que o smartphone recebeu o valor do produto
-                          delay(1000); // Delay para terminar tarefas pendentes
+                          delay(1050); // Delay para terminar tarefas pendentes
                     }
             
  }
+ 
  
   // Leitura da autenticação de pagamento
  if (verifWNFC == 1) // Verifica se o smartphone ja recebeu o valor do produto
@@ -353,7 +354,7 @@ void NFC()
                 }
   }
     digitalWrite(ledNFC, LOW); // Apagao LED indicando que desativou o NFC
-    delay(10); // Delay para terminar tarefas pendentes
+    delay(50); // Delay para terminar tarefas pendentes
 
     
 // FIM DO NFC
@@ -394,7 +395,7 @@ void Motor()
       {
         digitalWrite(ledsens, HIGH); // Ativa o LED indicando que o sensor foi ativado
         servo1.detach(); // Desliga o servo motor
-        analogWrite(6,0); // Desliga emissor dos sensores
+        digitalWrite(6,LOW); // Desliga emissor dos sensores
         Serial.println("JJJJ"); // Informa que o produto foi dispensado com sucesso
         delay(500);
         digitalWrite(ledsens, LOW); // Desativa o LED 
@@ -403,10 +404,10 @@ void Motor()
   else // Se não
       {
         
-        if (millis()- previousMillis > 8000) // Se passar 8 segundos com o valor do sensor menor que 200
+        if (millis()- previousMillis > 5000) // Se passar 5 segundos com o valor do sensor menor que 200
           {
              servo1.detach(); // Desliga o servo
-             analogWrite(6,0); // Desliga emissor dos sensores
+             digitalWrite(6,LOW); // Desliga emissor dos sensores
              Serial.println("PPPP"); // Informa que houve erro na dispensa do produto
              verifTM = 1; // Seta a verificação de estouro de tempo
           }
