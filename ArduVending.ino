@@ -341,9 +341,10 @@ void NFC()
                       else
                               {
                                   Serial.println("LLLL"); // Se não envia o saldo insulficiente
+                                  verifWNFC = 0; // Reseta variável para um novo ciclo
                                } 
             
-                delay(100); // Delay para terminar tarefas pendentes
+                delay(500); // Delay para terminar tarefas pendentes
                 }
                 
                 
@@ -395,7 +396,7 @@ void Motor()
       {
         digitalWrite(ledsens, HIGH); // Ativa o LED indicando que o sensor foi ativado
         servo1.detach(); // Desliga o servo motor
-        digitalWrite(6,LOW); // Desliga emissor dos sensores
+        digitalWrite(3,LOW); // Desliga emissor dos sensores
         Serial.println("JJJJ"); // Informa que o produto foi dispensado com sucesso
         delay(500);
         digitalWrite(ledsens, LOW); // Desativa o LED 
@@ -407,7 +408,7 @@ void Motor()
         if (millis()- previousMillis > 5000) // Se passar 5 segundos com o valor do sensor menor que 200
           {
              servo1.detach(); // Desliga o servo
-             digitalWrite(6,LOW); // Desliga emissor dos sensores
+             digitalWrite(3,LOW); // Desliga emissor dos sensores
              Serial.println("PPPP"); // Informa que houve erro na dispensa do produto
              verifTM = 1; // Seta a verificação de estouro de tempo
           }
