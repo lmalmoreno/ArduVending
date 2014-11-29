@@ -1,17 +1,18 @@
 
 /*
-                                        PROGRAMA DE CONTROLE DE VENDING MACHINE COM PAGAMENTO POR NFC
-                    ESTE PROGRAMA FAZ PARTE DE UM TCC E NÃO PODE SER USADO COMERCIALMENTE SEM A AUTORIZAÇÃO DE SEU(S) AUTORE(S)
+                                              PROGRAMA DE CONTROLE DE VENDING MACHINE COM PAGAMENTO POR NFC
+ ESTE PROGRAMA FAZ PARTE DO TRABALHO DE CONCLUSÃO DE CURSO "IMPLEMENTAÇÃO DE UMA VENDING MACHINE COM TECNOLOGIA NEAR FIELD COMMUNICATION PARA PAGAMENTO DIGITAL"
+                                         E NÃO PODE SER USADO COMERCIALMENTE SEM A AUTORIZAÇÃO DE SEU(S) AUTORE(S)
        
-       **** Este trabalho está licenciado com uma Licença Creative Commons - Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional. ****
-                                            http://creativecommons.org/licenses/by-nc-sa/4.0/
+             **** Este trabalho está licenciado sob uma Licença Creative Commons - Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional. ****
+                                                     http://creativecommons.org/licenses/by-nc-sa/4.0/
                                             
-               ESTE PROGRAMA, TODAS AS SUAS VERSÕES E NOTAS ESTÃO DISPONÍVEIS NO ENDEREÇO: https://github.com/lmalmoreno/ArduVending
+                     ESTE PROGRAMA, TODAS AS SUAS VERSÕES E NOTAS ESTÃO DISPONÍVEIS NO ENDEREÇO: https://github.com/lmalmoreno/ArduVending
               
-                                                     DESENVOLVIDO COM A IDE 1.0.5-r2
-                                                      DESENVOLVIDO PARA ARDUINO UNO
-                                                         CONCLUÍDO EM: 20/11/2014
-                                                       OBRIGADO PELO SEU INTERESSE!
+                                                           DESENVOLVIDO COM A IDE 1.0.5-r2
+                                                            DESENVOLVIDO PARA ARDUINO UNO
+                                                               CONCLUÍDO EM: 20/11/2014
+                                                             OBRIGADO PELO SEU INTERESSE!
         
 
 */
